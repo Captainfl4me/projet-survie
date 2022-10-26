@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class Inventory : MonoBehaviour
 {
     [SerializeField]
@@ -34,6 +35,7 @@ public class Inventory : MonoBehaviour
     public void CloseInventory()
     {
         _inventoryPanel.transform.gameObject.SetActive(false);
+        Cursor.visible = false;
     }
 
     public bool isFull()
@@ -43,10 +45,10 @@ public class Inventory : MonoBehaviour
     
     private void RefreshContent()
     {
-        Transform[] allSlot = _inventoryPanel.GetInventorySlotsVisual();
+        Slot[] allSlot = _inventoryPanel.GetInventorySlots();
         for (int i = 0; i < _content.Count; i++)
         {
-            allSlot[i].GetComponent<Image>().sprite = _content[i].visual;
+            allSlot[i].setItem(_content[i]);
         }
     }
 }

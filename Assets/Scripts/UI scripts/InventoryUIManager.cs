@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [ExecuteInEditMode]
+[RequireComponent(typeof(MenuMouseHandler))]
 public class InventoryUIManager : MonoBehaviour
 {
     [SerializeField]
@@ -60,13 +61,13 @@ public class InventoryUIManager : MonoBehaviour
         }
     }
 
-    public Transform[] GetInventorySlotsVisual()
+    public Slot[] GetInventorySlots()
     {
         int index = 0;
-        Transform[] allChildren = new Transform[_UIContent.transform.childCount];
+        Slot[] allChildren = new Slot[_UIContent.transform.childCount];
         foreach (Transform child in _UIContent.transform)
         {
-            allChildren[index++] = child.GetChild(0);
+            allChildren[index++] = child.GetComponent<Slot>();
         }
 
         return allChildren;

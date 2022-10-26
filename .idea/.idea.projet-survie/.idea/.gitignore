@@ -1,0 +1,11 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/.idea.projet-survie.iml
+/projectSettingsUpdater.xml
+# Datasource local storage ignored files
+/../../../../../../:\Unity project\projet-survie\.idea\.idea.projet-survie\.idea/dataSources/
+/dataSources.local.xml

@@ -9,4 +9,23 @@ public class ItemData : ScriptableObject
     public string description;
     public Sprite visual;
     public GameObject prefab;
+
+    public ItemType itemType;
+    public EquipmentType equipmentType;
+}
+
+public enum ItemType
+{
+    Ressource,
+    Equipement,
+    Consumable
+}
+
+public enum EquipmentType
+{
+    Head,
+    Chest,
+    Hands,
+    Legs,
+    Feet
 }

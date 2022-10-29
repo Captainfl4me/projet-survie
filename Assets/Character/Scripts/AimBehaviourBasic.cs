@@ -13,6 +13,7 @@ public class AimBehaviourBasic : GenericBehaviour
 	private int aimBool;                                                  // Animator variable related to aiming.
 	private bool aim;                                                     // Boolean to determine whether or not the player is aiming.
 
+	public bool canAim;
 	// Start is always called after any Awake functions.
 	void Start ()
 	{
@@ -23,6 +24,9 @@ public class AimBehaviourBasic : GenericBehaviour
 	// Update is used to set features regardless the active behaviour.
 	void Update ()
 	{
+		if (!canAim)
+			return;
+		
 		// Activate/deactivate aim by input.
 		if (Input.GetAxisRaw(aimButton) != 0 && !aim)
 		{

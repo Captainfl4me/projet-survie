@@ -7,6 +7,7 @@ public class MouseManager : MonoBehaviour
 {
     public List<MenuMouseHandler> menuWhereMouseNeeded;
     [SerializeField] private ThirdPersonOrbitCamBasic orbitCamScript;
+    [SerializeField] private AimBehaviourBasic aimBehaviourBasic;
     private bool _mouseNeeded = false;
 
     private void Update()
@@ -29,5 +30,6 @@ public class MouseManager : MonoBehaviour
         }
 
         orbitCamScript.canOrbit = !_mouseNeeded;
+        aimBehaviourBasic.canAim = !_mouseNeeded;
     }
 }

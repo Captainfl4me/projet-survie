@@ -16,6 +16,12 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         _item = item;
         _visualSprite.sprite = item.visual;
     }
+    
+    public void setItem(ItemData item, Sprite visual)
+    {
+        _item = item;
+        _visualSprite.sprite = visual;
+    }
 
     public ItemData getItem()
     {
@@ -31,5 +37,10 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public void OnPointerExit(PointerEventData eventData)
     {
         TooltipSystem.instance.Hide();
+    }
+
+    public void ClickOnSlot()
+    {
+        Inventory.instance.OpenActionPanel(_item, transform.position);
     }
 }

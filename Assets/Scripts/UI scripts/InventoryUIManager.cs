@@ -24,6 +24,11 @@ public class InventoryUIManager : MonoBehaviour
 
     public GameObject slotPrefab;
 
+    private void Start()
+    {
+        UpdateUI();
+    }
+    
     private void Awake()
     {
         _inventorySize = transform.GetComponent<RectTransform>();

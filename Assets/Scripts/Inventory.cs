@@ -3,32 +3,42 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 
 public class Inventory : MonoBehaviour
 {
-    [SerializeField]
-    private List<ItemData> _content = new List<ItemData>();
+    [Header("Inventory Panel References")] 
+    [SerializeField] private InventoryUIManager inventoryPanel;
+    [SerializeField] private Sprite emptyVisual;
+
+    [SerializeField] private Transform dropPoint;
     
-    [SerializeField] 
-    private InventoryUIManager _inventoryPanel;
-    [SerializeField] private Sprite _emptyVisual;
-
-    public static Inventory instance;
+    [SerializeField] private List<ItemData> content = new List<ItemData>();
+    
     [Header("Action Panel References")] 
-    [SerializeField] private GameObject _actionPanel;
-    [SerializeField] private GameObject _useItemButton;
-    [SerializeField] private GameObject _equipItemButton;
-    [SerializeField] private GameObject _dropItemButton;
-    [SerializeField] private GameObject _destroyItemButton;
+    [SerializeField] private GameObject actionPanel;
+    [SerializeField] private GameObject useItemButton;
+    [SerializeField] private GameObject equipItemButton;
+    [SerializeField] private GameObject dropItemButton;
+    [SerializeField] private GameObject destroyItemButton;
 
-    private ItemData _currItem;
+    private ItemData currItem;
 
-    [SerializeField]
-    private Transform _dropPoint;
+    [Header("Equipment Panel References")] 
+    [SerializeField] private EquipmentLibrary equipmentLibrary;
+    [SerializeField] private GameObject equipmentPanel;
 
-    [SerializeField] private EquipmentLibrary _equipmentLibrary;
+    [SerializeField] private EquipmentSlot headSlotImage;
+    [SerializeField] private EquipmentSlot chestSlotImage;
+    [SerializeField] private EquipmentSlot handsSlotImage;
+    [SerializeField] private EquipmentSlot legsSlotImage;
+    [SerializeField] private EquipmentSlot feetSlotImage;
+    
+    public static Inventory instance;
+
+    private bool isOpen = false;
     
     private void Awake()
     {
@@ -44,108 +54,160 @@ public class Inventory : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            _inventoryPanel.transform.gameObject.SetActive(!_inventoryPanel.transform.gameObject.activeSelf);
+            isOpen = !isOpen;
+
+            if (isOpen)
+                OpenInventory();
+            else
+                CloseInventory();
         }
     }
     
     public void AddItem(ItemData item)
     {
-        _content.Add(item);
+        content.Add(item);
         RefreshContent();
     }
 
+    private void OpenInventory()
+    {
+        inventoryPanel.transform.gameObject.SetActive(true);
+        equipmentPanel.SetActive(true);
+    }
+    
     public void CloseInventory()
     {
-        _inventoryPanel.transform.gameObject.SetActive(false);
-        CloseActoinPanel();
+        inventoryPanel.transform.gameObject.SetActive(false);
+        equipmentPanel.SetActive(false);
+        CloseActionPanel();
+        TooltipSystem.instance.Hide();
     }
 
-    public void CloseActoinPanel()
+    public void CloseActionPanel()
     {
-        _actionPanel.SetActive(false);
-        _currItem = null;
+        actionPanel.SetActive(false);
+        currItem = null;
     }
 
-    public bool isFull()
+    public bool IsFull()
     { 
-        return _content.Count >= _inventoryPanel.GetInventorySize();
+        return content.Count >= inventoryPanel.GetInventorySize();
     }
     
     private void RefreshContent()
     {
-        Slot[] allSlot = _inventoryPanel.GetInventorySlots();
+        Slot[] allSlot = inventoryPanel.GetInventorySlots();
         
         for (int i = 0; i < allSlot.Length; i++)
         {
-            if(i < _content.Count)
-                allSlot[i].setItem(_content[i]);
+            if(i < content.Count)
+                allSlot[i].setItem(content[i]);
             else
-                allSlot[i].setItem(null, _emptyVisual);
+                allSlot[i].setItem(null, emptyVisual);
         }
     }
 
     public void OpenActionPanel(ItemData item, Vector2 position)
     {
-        _currItem = item;
+        currItem = item;
         if (item == null)
         {
-            _actionPanel.SetActive(false);
+            actionPanel.SetActive(false);
             return;
         }
 
         switch (item.itemType)
         {
             case ItemType.Ressource:
-                _useItemButton.SetActive(false);
-                _equipItemButton.SetActive(false);
+                useItemButton.SetActive(false);
+                equipItemButton.SetActive(false);
                 break;
             case ItemType.Equipement:
-                _useItemButton.SetActive(false);
-                _equipItemButton.SetActive(true);
+                useItemButton.SetActive(false);
+                equipItemButton.SetActive(true);
                 break;
             case ItemType.Consumable:
-                _useItemButton.SetActive(true);
-                _equipItemButton.SetActive(false);
+                useItemButton.SetActive(true);
+                equipItemButton.SetActive(false);
                 break;
         }
         
-        _actionPanel.SetActive(true);
-        _actionPanel.transform.position = position;
+        actionPanel.SetActive(true);
+        actionPanel.transform.position = position;
     }
     
     public void UseActionButton()
     {
         RefreshContent();
-        CloseActoinPanel();
+        CloseActionPanel();
     }
     public void EquipActionButton()
     {
-        EquipmentLibraryItem equipmentLibraryItem = _equipmentLibrary.equipmentLibrary.Single(e => e.itemData == _currItem);
+        EquipmentLibraryItem equipmentLibraryItem = equipmentLibrary.equipmentLibrary.Single(e => e.itemData == currItem);
 
         if (equipmentLibraryItem != null)
         {
+            content.Remove(currItem);
+            RefreshContent();
+            
+            switch (currItem.equipmentType)
+            {
+                case EquipmentType.Head:
+                    headSlotImage.Equip(currItem);
+                    break;
+                case EquipmentType.Chest:
+                    chestSlotImage.Equip(currItem);
+                    break;
+                case EquipmentType.Hands:
+                    handsSlotImage.Equip(currItem);
+                    break;
+                case EquipmentType.Legs:
+                    legsSlotImage.Equip(currItem);
+                    break;
+                case EquipmentType.Feet:
+                    feetSlotImage.Equip(currItem);
+                    break;
+            }
+
             foreach (var equipmentToDisable in equipmentLibraryItem.elementsToDisable)
             {
                 equipmentToDisable.SetActive(false);
             }
 
             equipmentLibraryItem.itemPrefab.SetActive(true);
+            
+            CloseActionPanel();
         }
         else
             Debug.LogError("Item not found in list!!");
-
-        RefreshContent();
-        CloseActoinPanel();
     }
+    
+    public void DesequipActionButton(ItemData equipItem)
+    {
+        EquipmentLibraryItem equipmentLibraryItem = equipmentLibrary.equipmentLibrary.Single(e => e.itemData == equipItem);
+
+        if (equipmentLibraryItem != null)
+        {
+            foreach (var equipmentToDisable in equipmentLibraryItem.elementsToDisable)
+            {
+                equipmentToDisable.SetActive(true);
+            }
+
+            equipmentLibraryItem.itemPrefab.SetActive(false);
+        }
+        else
+            Debug.LogError("Item not found in list!!");
+    }
+    
     public void DropActionButton()
     {
-        Instantiate(_currItem.prefab, _dropPoint.position, Quaternion.identity);
+        Instantiate(currItem.prefab, dropPoint.position, Quaternion.identity);
         DestroyActionButton();
     }
     public void DestroyActionButton()
     {
-        _content.Remove(_currItem);
+        content.Remove(currItem);
         RefreshContent();
-        CloseActoinPanel();
+        CloseActionPanel();
     }
 }

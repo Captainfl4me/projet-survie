@@ -14,6 +14,8 @@ public class InventoryUIManager : MonoBehaviour
     [SerializeField] 
     private int _spacing = 6;
     [SerializeField]
+    private int _margin = 12;
+    [SerializeField]
     private Vector2 _uiPadding = new Vector2(4, 6);
 
     [SerializeField] 
@@ -64,6 +66,8 @@ public class InventoryUIManager : MonoBehaviour
         {
             Instantiate(slotPrefab, _UIContent.transform);
         }
+
+        _inventorySize.anchoredPosition = new Vector3(-gridWidth/2 - _margin, gridHeight/2 + _margin, 0);
     }
 
     public Slot[] GetInventorySlots()

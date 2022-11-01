@@ -16,7 +16,7 @@ public class PickUpBehaviour : MonoBehaviour
     private Item _currItem;
     public void DoPickUp(Item item)
     {
-        if (_inventory.isFull())
+        if (_inventory.IsFull())
         {
             Debug.Log("Inventory full");
             return;
